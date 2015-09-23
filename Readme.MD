@@ -32,4 +32,4 @@ and makes sure that it is sorted properly.
 7. Upon receiving a valid word, the retrieveLyric function looks the word up
 in the table, retrieve the array of songs, and prints the context of each occurence
 of the word.
-8. Input loop terminates after receiving the word "<BREAK"
+8. Input loop terminates after receiving the word "<BREAK>"
