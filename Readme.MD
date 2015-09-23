@@ -13,7 +13,7 @@ for the program.
 
 ### word
 - word
-- a reference to it's parent song
+- a reference to it's parent son
 - a slice of positions in terms of where this word is located in it's songs lyrics
 - implements the interface for Sort
 
@@ -32,4 +32,4 @@ and makes sure that it is sorted properly.
 7. Upon receiving a valid word, the retrieveLyric function looks the word up
 in the table, retrieve the array of songs, and prints the context of each occurence
 of the word.
-8. Input loop terminates after receiving the word "<BREAK>"
+8. Input loop terminates after receiving the word `<BREAK>`
