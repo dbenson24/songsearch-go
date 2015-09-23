@@ -14,10 +14,21 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "boom"
-	app.Usage = "make an explosive entrance"
+	app.Name = "songsearch"
+	app.Usage = "Search for the occurences of a word in a database of lyrics"
 	app.Action = func(c *cli.Context) {
-		readFile(c)
+		fmt.Println("Please specify a command")
+	}
+
+	app.Commands = []cli.Command{
+		{
+			Name:    "search",
+			Aliases: []string{"s"},
+			Usage:   "search [filePath]",
+			Action: func(c *cli.Context) {
+				readFile(c)
+			},
+		},
 	}
 
 	app.Run(os.Args)
@@ -55,7 +66,18 @@ func (w words) Less(i, j int) bool {
 
 func readFile(c *cli.Context) {
 	begin := time.Now()
-	filePath := "E:\\data\\text_dbs\\lyrics_fulldb.txt"
+	var filePath string
+	if len(c.Args()) == 1 {
+		filePath = c.Args()[0]
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			fmt.Println("No such file or directory:", filePath)
+			os.Exit(1)
+		}
+	} else {
+		fmt.Println("You must specify a filepath as the first and only argument")
+		os.Exit(1)
+	}
+	fmt.Println(filePath)
 	f, err := os.Open(filePath)
 	defer f.Close()
 	check(err)
@@ -168,26 +190,30 @@ func processSong(in chan song, out chan map[string]words) {
 }
 
 func retrieveLyric(lyric string, table map[string]words, songs []song) {
-	occurences := table[lyric]
-	for _, node := range occurences {
-		song := songs[node.songID]
-		for _, position := range node.positions {
-			fmt.Println("Title:", song.title)
-			fmt.Println("Arist:", song.artist)
-			var start int
-			var end int
-			if position < 5 {
-				start = 0
-			} else {
-				start = position - 5
+	occurences, ok := table[lyric]
+	if ok {
+		for _, node := range occurences {
+			song := songs[node.songID]
+			for _, position := range node.positions {
+				fmt.Println("Title:", song.title)
+				fmt.Println("Arist:", song.artist)
+				var start int
+				var end int
+				if position < 5 {
+					start = 0
+				} else {
+					start = position - 5
+				}
+				if position+6 >= len(song.words) {
+					end = len(song.words)
+				} else {
+					end = position + 6
+				}
+				fmt.Println("Context:", strings.Join(song.words[start:end], " "))
 			}
-			if position+6 >= len(song.words) {
-				end = len(song.words)
-			} else {
-				end = position + 6
-			}
-			fmt.Println("Context:", strings.Join(song.words[start:end], " "))
 		}
+		fmt.Println("<END-OF-REPORT>")
+	} else {
+		fmt.Println("Search term not found")
 	}
-	fmt.Println("<END-OF-REPORT>")
 }
